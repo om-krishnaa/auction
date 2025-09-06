@@ -1,0 +1,106 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body p-4">
+          <h4 class="card-title text-center mb-4">Email Verification</h4>
+          <p class="text-center text-muted mb-4">Please enter the verification code sent to your email.</p>
+
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="mb-4">
+              <label for="otp" class="form-label">Verification Code</label>
+              <input 
+                type="text" 
+                name="otp" 
+                id="otp" 
+                class="form-control text-center" 
+                maxlength="6" 
+                pattern="\d{6}" 
+                placeholder="Enter 6-digit code"
+                required
+                style="letter-spacing: 5px; font-size: 18px;"
+              >
+            </div>
+
+            <div class="d-grid mb-3">
+              <button type="submit" class="btn btn-primary">Verify Code</button>
+            </div>
+
+            <div class="text-center">
+              <p class="text-muted mb-3" id="timer">Code expires in: <span id="countdown">10:00</span></p>
+              <p>
+                Didn't receive the code? 
+                <a href="{% url 'resend_otp' %}" class="text-decoration-none">Resend code</a>
+              </p>
+              <a href="{% url 'register' %}" class="text-decoration-none">← Back to Registration</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card {
+  border: none;
+  border-radius: 10px;
+}
+.btn-primary {
+  padding: 10px;
+}
+</style>
+
+<script>
+// Timer functionality
+function startTimer(duration, display) {
+    let timer = duration, minutes, seconds;
+    let countdown = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(countdown);
+            display.textContent = "Expired";
+            window.location.href = "{% url 'register' %}";
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    let tenMinutes = 60 * 10,
+        display = document.querySelector('#countdown');
+    startTimer(tenMinutes, display);
+};
+
+// Auto-hide alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

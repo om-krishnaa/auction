@@ -1,0 +1,241 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<style>
+  .banner-section {
+    position: relative;
+    height: 90vh;
+    overflow: hidden;
+  }
+  .carousel-item img {
+    object-fit: fill;
+    height: 100%;
+    width: 100%;
+  }
+  .live-now {
+    z-index: 10;
+    border-radius: 0 0 10px 10px;
+  }
+  .btn-outline-danger:disabled {
+    opacity: 0.10;
+    cursor: not-allowed;
+  }
+</style>
+
+<!-- Banner Section -->
+<section class="banner-section d-flex justify-content-center align-items-start">
+  <div class="live-now position-absolute top-0 start-50 translate-middle-x text-white py-2 px-4 fw-bold bg-danger">
+    🔴 Live Now: Bidding Open!
+  </div>
+
+  <div id="customBannerCarousel" class="carousel slide w-100 h-100" data-bs-ride="carousel">
+    <div class="carousel-inner h-100">
+      <!-- Slide 1 -->
+      <div class="carousel-item active h-100 position-relative">
+        <img src="{% static 'images/banner1.svg' %}" class="d-block w-100 h-100" alt="Welcome to eAuction">
+        <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white text-center">
+          <h1 class="display-4 fw-bold"></h1>
+          <p class="lead"></p>
+          <a href="#auctions" class="btn btn-light btn-lg mt-3">Start Bidding</a>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-item h-100 position-relative">
+        <img src="{% static 'images/banner2.svg' %}" class="d-block w-100 h-100" alt="Explore Great Deals">
+        <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white text-center">
+          <h1 class="display-4 fw-bold"></h1>
+          <p class="lead"></p>
+          <a href="#auctions" class="btn btn-light btn-lg mt-3">Browse Products</a>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-item h-100 position-relative">
+        <img src="{% static 'images/banner3.svg' %}" class="d-block w-100 h-100" alt="Trusted by Thousands">
+        <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-white text-center">
+          <h1 class="display-4 fw-bold"></h1>
+          <p class="lead"></p>
+          <a href="{% url 'register' %}" class="btn btn-light btn-lg mt-3">Join Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#customBannerCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#customBannerCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#customBannerCarousel" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#customBannerCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#customBannerCarousel" data-bs-slide-to="2"></button>
+    </div>
+  </div>
+</section>
+
+<!-- Current Auctions Section -->
+<section id="auctions" class="py-5">
+  <div class="container">
+    <h2 class="mb-4 text-dark fw-bold">
+      <i class="bi bi-gavel me-2"></i>Current Auctions
+    </h2>
+    <div class="row g-4">
+      {% for product in Auction %}
+      <div class="col-md-3 col-sm-6">
+        <div class="card product-card p-3 border-0 shadow-sm h-100 d-flex flex-column justify-content-between">
+          <div class="position-relative">
+            {% if product.product_image %}
+              <img src="{{ product.product_image.url }}" alt="{{ product.title }}" class="img-fluid product-image mb-3">
+            {% else %}
+              <img src="{% static 'images/placeholder.svg' %}" alt="{{ product.title }}" class="img-fluid product-image mb-3">
+            {% endif %}
+            <div class="position-absolute top-0 start-0 m-2">
+              <span class="badge bg-primary d-flex align-items-center">
+                <i class="bi bi-tag me-1"></i>
+                <span>{{ product.get_category_display }}</span>
+              </span>
+            </div>
+          </div>
+          <div class="text-center">
+            <h5 class="fw-bold">{{ product.title }}</h5>
+            <p class="text-muted small">{{ product.brand }}</p>
+            <p class="fs-5 text-success fw-bold">Rs. {{ product.selling_price|floatformat:0 }}</p>
+          </div>
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-primary mt-2">Bid Now</a>
+          {% else %}
+          <a href="{% url 'login' %}?next={% url 'product_detail' product.pk %}" class="btn btn-outline-primary mt-2">Bid Now</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Auctions Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="mb-0 text-dark fw-bold">Upcoming Auctions</h2>
+    <div class="row g-4">
+      {% for i in upcoming %}
+      <div class="col-md-3 col-sm-6">
+        <div class="card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-img-top text-center p-3">
+            <img src="{{ i.product_image.url }}" class="img-fluid rounded-2" alt="{{ i.title }}" style="max-height: 200px; object-fit: cover;">
+          </div>
+          <div class="card-body text-center">
+            <h5 class="card-title mb-3">{{ i.title }}</h5>
+            <button class="btn btn-outline-danger mt-2" disabled>
+              <span class="text-danger fw-bold">Upcoming</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- About Us Section -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="mb-0 text-dark fw-bold">About Us</h2>
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-4 mb-md-0">
+        <img src="{% static 'assets/img/backgrounds/a.png' %}" alt="About Us" class="img-fluid rounded-3 shadow">
+      </div>
+      <div class="col-md-6">
+        <p><strong>E-Auction</strong> is a trusted and growing online auction platform specializing in electronic devices such as laptops, mobile phones, smartwatches, and more.</p>
+        <p>We aim to create a convenient, transparent, and secure marketplace for buyers and sellers across Nepal.</p>
+        <p class="lead">We are a trusted auction platform bringing buyers and sellers together in a secure and transparent environment.</p>
+        <p>Our mission is to make online bidding easy, exciting, and accessible to everyone. With a wide range of products and seamless auction experiences, we empower users to find great deals and unique items daily.</p>
+        <a href="{% url 'about_us' %}" class="btn btn-primary mt-3">Learn More</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="mb-0 text-center text-dark fw-bold">Frequently Asked Questions</h2>
+    <div class="accordion" id="faqAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+            How do I register for an auction?
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            You can register by clicking on the "Sign Up" button at the top-right and filling out your basic details.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+            Is there a fee to participate in auctions?
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Most auctions are free to join, but some premium listings may have a small entry fee.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+            How do I place a bid?
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Simply log in, go to the auction page, and click the "Place Bid" button with your desired amount.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+            What happens if I win the auction?
+          </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            You’ll receive a confirmation email with payment and shipping instructions. Make sure to complete the payment within the specified time.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  $(document).ready(function(){
+    $().owlCarousel({
+      items: 4,
+      loop: true,
+      margin: 10,
+      nav: true,
+      autoplay: true,
+      autoplayTimeout: 3000,
+      autoplayHoverPause: true
+    });
+  });
+</script>
+{% endblock %}

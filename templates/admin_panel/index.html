@@ -1,0 +1,162 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Statistics Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Total Users Card -->
+    <div class="col-xl-4 col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-shape bg-primary text-white rounded-3 me-3">
+                <i class="bi bi-people-fill"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-muted">Total Users</h6>
+                <h3 class="mb-0">{{ total_users }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Users This Week -->
+    <div class="col-xl-4 col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-shape bg-success text-white rounded-3 me-3">
+                <i class="bi bi-person-plus-fill"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-muted">New This Week</h6>
+                <h3 class="mb-0">{{ new_users_this_week }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Users This Month -->
+    <div class="col-xl-4 col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-shape bg-info text-white rounded-3 me-3">
+                <i class="bi bi-calendar3"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-muted">New This Month</h6>
+                <h3 class="mb-0">{{ new_users_this_month }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Users Table -->
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">Recent Users</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="border-0" width="60">S.n</th>
+              <th class="border-0">Username</th>
+              <th class="border-0">Email</th>
+              <th class="border-0">User Type</th>
+              <th class="border-0">Join Date</th>
+              {% comment %} <th class="border-0">Actions</th> {% endcomment %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in recent_users %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                {% if user.user_type == 'admin' %}
+                  <span class="badge bg-primary-subtle text-primary">Admin</span>
+                {% else %}
+                  <span class="badge bg-info-subtle text-info">User</span>
+                {% endif %}
+              </td>
+              <td>{{ user.date_joined|date:"M d, Y H:i" }}</td>
+              <td>
+                {% comment "" %}
+                <a href="{% url 'user-delete' user.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">
+                  <i class="bi bi-trash"></i>
+                </a>
+                {% endcomment %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.icon-shape {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.icon-shape i {
+  font-size: 1.5rem;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1);
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 0;
+  margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Site Settings</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'admin' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Site Settings</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-cog me-1"></i>
+            Manage Site Settings
+            <a href="{% url 'sitesetting_add' %}" class="btn btn-primary btn-sm float-end">
+                <i class="fas fa-plus"></i> Add New
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Office Info</th>
+                            <th>Contact</th>
+                            <th>Social Media</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setting in settings %}
+                        <tr>
+                            <td>
+                                <strong>Description:</strong> {{ setting.office_description }}<br>
+                                <strong>Address:</strong> {{ setting.office_address }}
+                            </td>
+                            <td>
+                                <strong>Phone:</strong> {{ setting.office_phone }}<br>
+                                <strong>Email:</strong> {{ setting.office_email }}
+                            </td>
+                            <td>
+                                {% if setting.facebook %}
+                                <a href="{{ setting.facebook }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.x %}
+                                <a href="{{ setting.x }}" target="_blank" class="btn btn-sm btn-outline-dark me-1">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.instagram %}
+                                <a href="{{ setting.instagram }}" target="_blank" class="btn btn-sm btn-outline-danger me-1">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.linkedin %}
+                                <a href="{{ setting.linkedin }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'sitesetting_edit' setting.pk %}" class="btn btn-warning btn-sm">
+
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

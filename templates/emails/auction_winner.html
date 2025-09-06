@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congratulations! You Won!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .product-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .winning-bid {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎉 Congratulations!</h1>
+        <h2>You Won the Auction!</h2>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ winner.username }},</p>
+        
+        <p>We're excited to inform you that you have won the auction for:</p>
+        
+        <div class="product-info">
+            <h3>{{ product.title }}</h3>
+            {% if product.product_image %}
+                <img src="{{ product.product_image.url }}" alt="{{ product.title }}" class="product-image">
+            {% endif %}
+            <p><strong>Brand:</strong> {{ product.brand }}</p>
+            <p><strong>Description:</strong> {{ product.description|truncatewords:20 }}</p>
+        </div>
+        
+        <div class="winning-bid">
+            Your Winning Bid: Rs. {{ winning_bid|floatformat:0 }}
+        </div>
+        
+        <p>Your auction has ended and you are the highest bidder! Here's what happens next:</p>
+        
+        <ul>
+            <li>You will receive a payment confirmation email shortly</li>
+            <li>Once payment is confirmed, we will process your order</li>
+            <li>Your item will be shipped to your registered address</li>
+            <li>You will receive tracking information once shipped</li>
+        </ul>
+        
+        <p>Please complete your payment within 24 hours to secure your purchase.</p>
+        
+        <div style="text-align: center;">
+            <a href="#" class="cta-button">Complete Payment</a>
+        </div>
+        
+        <p>If you have any questions, please don't hesitate to contact our support team.</p>
+        
+        <p>Thank you for participating in our auction!</p>
+        
+        <p>Best regards,<br>
+        The eAuction Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>This is an automated message. Please do not reply to this email.</p>
+        <p>© 2024 eAuction Platform. All rights reserved.</p>
+    </div>
+</body>
+</html>

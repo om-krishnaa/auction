@@ -1,0 +1,32 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+
+{% block title %}Current Auctions{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h3 class="mb-4 text-center">Live Product Auctions</h3>
+
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.title }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ product.title }}</h5>
+                    <p class="text-success fw-bold">Rs.{{ product.discounted_price }}
+                        <span class="text-muted text-decoration-line-through small">Rs.{{ product.selling_price }}</span>
+                    </p>
+                    <a href="{% url 'product_detail' product.id %}" class="btn btn-primary btn-sm">Bid Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center text-muted">No products are currently available for auction.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

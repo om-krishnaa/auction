@@ -1,0 +1,66 @@
+{% extends "admin_panel/base.html" %}
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">{{ product.title }}</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ product.product_image.url }}" class="img-fluid rounded shadow" alt="{{ product.title }}">
+        </div>
+        <div class="col-md-6">
+            <ul class="list-group mb-3">
+                <li class="list-group-item"><strong>Description:</strong> {{ product.description }}</li>
+                <li class="list-group-item"><strong>Base Price:</strong> Rs. {{ product.selling_price }}</li>
+                <li class="list-group-item"><strong>Auction Starts:</strong> {{ product.event|date:"M d, Y H:i" }}</li>
+                <li class="list-group-item"><strong>Auction Ends:</strong> {{ product.event_ends|date:"M d, Y H:i" }}</li>
+            </ul>
+
+            {% if highest_bid %}
+            <div class="alert alert-success">
+                <strong>Highest Bid:</strong> Rs. {{ highest_bid.bid_amount }} by <strong>{{ highest_bid.user.username }}</strong>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                No bids placed yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <h4 class="mt-5">All Bids</h4>
+    {% if bids %}
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Bidder</th>
+                <th>Bid Amount (Rs.)</th>
+                <th>Bid Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ bid.user.username }}</td>
+                <td>Rs. {{ bid.bid_amount }}</td>
+                <td>{{ bid.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    {% if bid == highest_bid %}
+                        <span class="badge bg-success">Highest Bid Winner</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Normal</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No bids available for this product.</p>
+    {% endif %}
+</div>
+{% endblock %}

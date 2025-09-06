@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Dashboard CSS -->
+  <link rel="stylesheet" href="{% static 'admin_panel/css/dashboard.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .layout-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .layout-menu {
+      width: 250px;
+      background-color: #0f172a;
+      color: #fff;
+      padding-top: 1.5rem;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-brand {
+      padding: 0 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .app-brand a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .menu-inner {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-item {
+      margin: 0.25rem 0.75rem;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .menu-link:hover,
+    .menu-item.active .menu-link {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .menu-icon {
+      margin-right: 0.75rem;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      text-align: center;
+    }
+
+    .layout-page {
+      flex: 1;
+      margin-left: 250px;
+    }
+
+    .layout-navbar {
+      background-color: #fff;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-menu {
+      margin-left: auto;
+    }
+
+    .user-menu-button {
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .user-menu-button:hover {
+      background-color: #f1f5f9;
+    }
+
+    .user-menu-button img {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border-radius: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .content-wrapper {
+      padding: 1.5rem;
+      background-color: #f1f5f9;
+      min-height: calc(100vh - 4rem);
+    }
+
+    .menu-divider {
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 1rem 1.5rem;
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <aside class="layout-menu">
+      <div class="app-brand">
+        <a href="{% url 'admin' %}">
+          <img src="{% static 'images/logo.svg' %}" alt="eAuction Logo" height="32" class="me-2">
+          <span>eAuction Admin</span>
+        </a>
+      </div>
+
+      <ul class="menu-inner">
+        <li class="menu-item {% if request.resolver_match.url_name == 'admin' %}active{% endif %}">
+          <a href="{% url 'admin' %}" class="menu-link">
+            <i class="bi bi-speedometer2 menu-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'product' in request.path %}active{% endif %}">
+          <a href="{% url 'product-list' %}" class="menu-link">
+            <i class="bi bi-box menu-icon"></i>
+            <span>Products</span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'users' in request.path %}active{% endif %}">
+          <a href="{% url 'all_users' %}" class="menu-link">
+            <i class="bi bi-people menu-icon"></i>
+            <span> Auction Result </span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'fraud' in request.path %}active{% endif %}">
+          <a href="{% url 'fraud_dashboard' %}" class="menu-link">
+            <i class="bi bi-shield-exclamation menu-icon"></i>
+            <span>Fraud Detection</span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'auctions' in request.path %}active{% endif %}">
+          <a href="{% url 'auction_management' %}" class="menu-link">
+            <i class="bi bi-gavel menu-icon"></i>
+            <span>Auction Management</span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'aboutus' in request.path %}active{% endif %}">
+          <a href="{% url 'aboutus_list' %}" class="menu-link">
+            <i class="bi bi-info-circle menu-icon"></i>
+            <span>About Us</span>
+          </a>
+        </li>
+
+        <li class="menu-item {% if 'settings' in request.path %}active{% endif %}">
+          <a href="{% url 'sitesetting_list' %}" class="menu-link">
+            <i class="bi bi-gear menu-icon"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+
+        <div class="menu-divider"></div>
+
+        <li class="menu-item {% if 'feedback' in request.path %}active{% endif %}">
+          <a href="{% url 'feedback' %}" class="menu-link">
+            <i class="bi bi-chat-dots menu-icon"></i>
+            <span>Feedback</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a href="{% url 'export_bids_csv' %}" class="menu-link">
+            <i class="bi bi-download menu-icon"></i>
+            <span>Export Bids Report</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="layout-page">
+      <!-- Navbar -->
+      <nav class="layout-navbar navbar navbar-expand-lg">
+        <div class="container-fluid px-0">
+          <div class="navbar-brand text-dark">
+            {% block page_title %}Admin Panel{% endblock %}
+          </div>
+
+          <div class="user-menu">
+            <div class="dropdown">
+              <button class="user-menu-button" type="button" data-bs-toggle="dropdown">
+                <img src="{% static 'assets/img/avatars/image.png' %}" alt="User Avatar">
+                <span class="d-none d-md-inline">{{ request.user.username }}</span>
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="bi bi-house-door me-2"></i>
+                    Visit Site
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Content -->
+      <div class="content-wrapper">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% block content %}
+<h1 class="text-center alert alert-info">Customer Feedback</h1>
+<div class="container">
+    <div class="row-1">
+        <div class="col-8 mx-auto alert alert-success">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for i in data %}
+                  <tr>
+                    <th scope="row">{{ i.id }}</th>
+                    <td>{{ i.name }}</td>
+                    <td>{{ i.email }}</td>
+                    <td>{{ i.subject }}</td>
+                    <td>{{ i.message }}</td>
+                    <td>{{ i.created_at|date:"M d, Y" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

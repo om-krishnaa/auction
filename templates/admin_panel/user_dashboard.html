@@ -1,0 +1,51 @@
+
+{% extends 'admin_panel/base.html' %}
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<h3 class="mt-5">Bidding Records </h3>
+    <a href="{% url 'export_bids_csv' %}" class="btn btn-primary mb-3">Export Bids to CSV</a>
+
+
+{% if bids_by_product %}
+    {% for product, bids in bids_by_product.items %}
+        <h4 class="mt-4 text-primary">{{ product.title }}</h4>
+        <table class="table table-bordered table-hover">
+            <thead class="table-info">
+                <tr>
+                    <th>User</th>
+                    <th>Bid Amount (Rs.)</th>
+                    <th>Bid Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bid in bids %}
+                <tr>
+                    <td>{{ bid.user.username }}</td>
+                    <td>Rs. {{ bid.bid_amount }}</td>
+                    <td>{{ bid.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        {% if bid.status == "Highest" %}
+                            <span class="badge bg-success">Winner</span>
+                        {% else %}
+                            <span class="badge bg-secondary"></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% else %}
+    <p>No bids found.</p>
+{% endif %}
+
+{% endblock %}
+
+
+
+
+
+
+

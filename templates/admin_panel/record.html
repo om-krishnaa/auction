@@ -1,0 +1,49 @@
+{% extends "admin_panel/base.html" %}
+{% block content %}
+<h3 class="mt-5">Bidding Records by Product</h3>
+
+{% for entry in bidding_records %}
+<div class="card mb-4 shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <strong>{{ entry.product.title }}</strong>
+        <div>
+            <a href="{% url 'product-detail' entry.product.id %}" class="btn btn-light btn-sm me-2">View Product Details</a>
+            <a href="{% url 'export-product-bids' entry.product.id %}" class="btn btn-outline-light btn-sm">Export Bids (CSV)</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if entry.bids %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Bid Amount (Rs.)</th>
+                    <th>Bid Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bid in entry.bids %}
+                <tr>
+                    <td>{{ bid.user.username }}</td>
+                    <td>Rs. {{ bid.bid_amount }}</td>
+                    <td>{{ bid.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        {% if bid.status == "Highest" %}
+                            <span class="badge bg-success">Highest Bid Winner</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Normal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No bids found for this product.</p>
+        {% endif %}
+    </div>
+</div>
+
+</div>
+{% endblock %}

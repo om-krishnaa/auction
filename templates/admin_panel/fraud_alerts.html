@@ -1,0 +1,156 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Fraud Alerts{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">Fraud Alerts</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="severity" class="form-label">Severity</label>
+                            <select name="severity" id="severity" class="form-select">
+                                <option value="">All Severities</option>
+                                {% for value, label in severity_choices %}
+                                    <option value="{{ value }}" {% if request.GET.severity == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">All Statuses</option>
+                                <option value="unresolved" {% if request.GET.status == 'unresolved' %}selected{% endif %}>Unresolved</option>
+                                <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="alert_type" class="form-label">Alert Type</label>
+                            <select name="alert_type" id="alert_type" class="form-select">
+                                <option value="">All Types</option>
+                                {% for value, label in alert_type_choices %}
+                                    <option value="{{ value }}" {% if request.GET.alert_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <a href="{% url 'fraud_alerts_list' %}" class="btn btn-secondary">Clear</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Product</th>
+                                    <th>Alert Type</th>
+                                    <th>Severity</th>
+                                    <th>Risk Score</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alert in alerts %}
+                                <tr>
+                                    <td>{{ alert.id }}</td>
+                                    <td>
+                                        <a href="{% url 'flag_user' alert.user.id %}">
+                                            {{ alert.user.username }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if alert.product %}
+                                            <a href="{% url 'product_detail' alert.product.id %}">
+                                                {{ alert.product.title }}
+                                            </a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ alert.get_alert_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if alert.severity == 'CRITICAL' %}danger{% elif alert.severity == 'HIGH' %}warning{% elif alert.severity == 'MEDIUM' %}info{% else %}secondary{% endif %}">
+                                            {{ alert.severity }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-{% if alert.risk_score >= 80 %}danger{% elif alert.risk_score >= 60 %}warning{% elif alert.risk_score >= 40 %}info{% else %}success{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ alert.risk_score }}%"
+                                                 aria-valuenow="{{ alert.risk_score }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ alert.risk_score|floatformat:1 }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if alert.is_resolved %}
+                                            <span class="badge bg-success">Resolved</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Unresolved</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ alert.created_at|timesince }} ago</td>
+                                    <td>
+                                        {% if not alert.is_resolved %}
+                                            <a href="{% url 'resolve_fraud_alert' alert.id %}" class="btn btn-sm btn-success">
+                                                Resolve
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Resolved by {{ alert.resolved_by.username }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No alerts found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

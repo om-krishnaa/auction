@@ -1,0 +1,152 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">{% if setting %}Edit{% else %}Add New{% endif %} Site Setting</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'admin' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admin_sitesetting_list' %}">Site Settings</a></li>
+        <li class="breadcrumb-item active">{% if setting %}Edit{% else %}Add New{% endif %} Setting</li>
+    </ol>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-edit me-1"></i>
+                    Site Setting Form
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.office_description.id_for_label }}" class="form-label">Office Description</label>
+                                {{ form.office_description }}
+                                {% if form.office_description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.office_description.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.office_phone.id_for_label }}" class="form-label">Office Phone</label>
+                                {{ form.office_phone }}
+                                {% if form.office_phone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.office_phone.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.office_address.id_for_label }}" class="form-label">Office Address</label>
+                                {{ form.office_address }}
+                                {% if form.office_address.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.office_address.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.office_email.id_for_label }}" class="form-label">Office Email</label>
+                                {% comment %} {{ form.office_email }}
+                                {% if form.office_email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.office_email.errors.0 }}
+                                </div>
+                                {% endif %} {% endcomment %}
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">Social Media Links</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.facebook.id_for_label }}" class="form-label">
+                                    <i class="fab fa-facebook text-primary me-1"></i>Facebook URL
+                                </label>
+                                {% comment %} {{ form.facebook }}
+                                {% if form.facebook.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.facebook.errors.0 }}
+                                </div>
+                                {% endif %} {% endcomment %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.x.id_for_label }}" class="form-label">
+                                    <i class="fab fa-twitter text-info me-1"></i>X (Twitter) URL
+                                </label>
+                                {% comment %} {{ form.x }}
+                                {% if form.x.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.x.errors.0 }}
+                                </div>
+                                {% endif %} {% endcomment %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.instagram.id_for_label }}" class="form-label">
+                                    <i class="fab fa-instagram text-danger me-1"></i>Instagram URL
+                                </label>
+                                {% comment %} {{ form.instagram }}
+                                {% if form.instagram.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.instagram.errors.0 }}
+                                </div>
+                                {% endif %} {% endcomment %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.linkedin.id_for_label }}" class="form-label">
+                                    <i class="fab fa-linkedin text-primary me-1"></i>
+                                </label>
+                                {% comment %} {{ form.linkedin }}
+                                {% if form.linkedin.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.linkedin.errors.0 }}
+                                </div>
+                                {% endif %} {% endcomment %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.iframe.id_for_label }}" class="form-label">
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i>Map Iframe
+                            </label>
+                            {{ form.iframe }}
+                            {% if form.iframe.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.iframe.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Paste the Google Maps embed iframe code here</div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="{% url 'admin_sitesetting_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

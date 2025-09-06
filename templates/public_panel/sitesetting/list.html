@@ -1,0 +1,92 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Site Settings</h4>
+            <a href="{% url 'sitesetting_create' %}" class="btn btn-light">
+                <i class="bi bi-plus-circle me-2"></i>Add New Setting
+            </a>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if sitesettings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Office Description</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Social Media</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setting in sitesettings %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ setting.office_description }}</td>
+                            <td>{{ setting.office_phone }}</td>
+                            <td>{{ setting.office_address }}</td>
+                            <td>{{ setting.office_email }}</td>
+                            <td>
+                                {% if setting.facebook %}
+                                <a href="{{ setting.facebook }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.x %}
+                                <a href="{{ setting.x }}" target="_blank" class="btn btn-sm btn-outline-dark me-1">
+                                    <i class="bi bi-twitter-x"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.instagram %}
+                                <a href="{{ setting.instagram }}" target="_blank" class="btn btn-sm btn-outline-danger me-1">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                                {% endif %}
+                                {% if setting.linkedin %}
+                                <a href="{{ setting.linkedin }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'sitesetting_update' setting.pk %}" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'sitesetting_delete' setting.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-gear display-1 text-muted"></i>
+                <p class="lead mt-3">No site settings found</p>
+                <a href="{% url 'sitesetting_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add First Setting
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

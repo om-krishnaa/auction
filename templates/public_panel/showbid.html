@@ -1,0 +1,74 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+{% block title %}Bidding Details{% endblock title %}
+{% block main-content %}
+
+<div class="container my-5">
+
+    {% if user_highest_bids %}
+    
+        <h4 class="mb-4 text-center text-success">YOU ARE HIGHEST BIDDER IN FOLLOWING ITEMS</h4>
+
+        <h5>DETAILS</h5>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">S.N</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Bid Amount (Rs.)</th>
+                    <th scope="col">Product Title</th>
+                    <th scope="col">Product Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for details in user_highest_bids %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ details.user.username }}</td>
+                    <td>Rs. {{ details.bid_amount }}</td>
+                    <td>{{ details.product.title }}</td>
+                    <td>{{ details.product.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <div class="text-center mt-5">
+            <h4 class="text-warning">Looks like you are not the highest bidder for any item yet.</h4>
+        </div>
+    {% endif %}
+
+    <hr class="my-5">
+
+    <h4 class="mb-4 text-center text-primary">YOUR ALL BIDS</h4>
+
+    {% if user_all_bids %}
+    <table class="table table-striped table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col">S.N</th>
+                <th scope="col">Bid Amount (Rs.)</th>
+                <th scope="col">Product Title</th>
+                <th scope="col">Date of Bid</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in user_all_bids %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>Rs. {{ bid.bid_amount }}</td>
+                <td>{{ bid.product.title }}</td>
+                <td>{{ bid.created_at|date:"M d, Y H:i" }}</td> <!-- Assuming you have created_at field -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="text-center mt-5">
+            <h4 class="text-warning">You have not placed any bids yet.</h4>
+        </div>
+    {% endif %}
+</div>
+{% endblock main-content %}

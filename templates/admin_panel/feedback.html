@@ -1,0 +1,53 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Customer Feedback</h4>
+        </div>
+        <div class="card-body">
+            {% if feedbacks %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for feedback in feedbacks %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ feedback.first_name }} {{ feedback.last_name }}</td>
+                            <td>
+                                <a href="mailto:{{ feedback.email }}" class="text-decoration-none">
+                                    {{ feedback.email }}
+                                </a>
+                            </td>
+                            <td>{{ feedback.subject }}</td>
+                            <td>
+                            <div class="feedback-message">
+                {{ feedback.message }}
+              </div>
+            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <p class="lead mt-3">No feedback messages yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

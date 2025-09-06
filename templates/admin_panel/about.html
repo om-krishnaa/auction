@@ -1,0 +1,204 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">About Us Management</h1>
+        <a href="{% url 'aboutus_add' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add New Content
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if about_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="aboutUsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px">S.n</th>
+                                <th style="width: 120px">Image</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th style="width: 120px">Status</th>
+                                <th style="width: 150px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sortable">
+                            {% for item in about_items %}
+                                <tr data-id="{{ item.id }}">
+                                    <td>
+                                        <i class="bi bi-grip-vertical handle" style="cursor: move"></i>
+                                        {{ forloop.counter }}
+                                    </td>
+                                    <td>
+                                        {% if item.image %}
+                                            <img src="{{ item.image.url }}" alt="{{ item.title }}" 
+                                                 class="img-thumbnail" style="max-height: 80px">
+                                        {% else %}
+                                            <img src="{% static 'images/placeholder.svg' %}" alt="No Image" 
+                                                 class="img-thumbnail" style="max-height: 80px">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.title }}</td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 300px">
+                                            {{ item.description }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'aboutus_toggle_status' item.pk %}" 
+                                              method="post" class="d-inline status-toggle-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm {% if item.is_active %}btn-success{% else %}btn-secondary{% endif %}">
+                                                {% if item.is_active %}
+                                                    <i class="bi bi-eye"></i> Active
+                                                {% else %}
+                                                    <i class="bi bi-eye-slash"></i> Inactive
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'aboutus_update' item.pk %}" 
+                                               class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil">Update</i>
+                                            </a>
+                                            <a href="{% url 'aboutus_delete' item.pk %}" 
+                                               class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash">Delete</i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-info-circle fs-1 text-muted"></i>
+                    <p class="h5 mt-3 text-muted">No About Us content added yet.</p>
+                    <a href="{% url 'aboutus_add' %}" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-lg"></i> Add First Content
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if about_items %}
+    <!-- jQuery UI for drag and drop sorting -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script>
+        $(document).ready(function() {
+            $('.sortable').sortable({
+                handle: '.handle',
+                axis: 'y',
+                update: function() {
+                    var itemIds = [];
+                    $('.sortable tr').each(function() {
+                        itemIds.push($(this).data('id'));
+                    });
+
+                    $.ajax({
+                        url: '{% url "aboutus_reorder" %}',
+                        method: 'POST',
+                        data: {
+                            'item_ids[]': itemIds,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                // Optional: Show success message
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Add AJAX setup for CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            const csrftoken = getCookie('csrftoken');
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+            // Handle status toggle forms with AJAX
+            $('.status-toggle-form').on('submit', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error toggling status:', error);
+                        alert('Error toggling status. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .handle {
+            cursor: move;
+            color: #6c757d;
+        }
+        .ui-sortable-helper {
+            display: table;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .sortable tr {
+            transition: background-color 0.2s ease;
+        }
+        .sortable tr:hover {
+            background-color: #f8f9fa;
+        }
+        .btn-group {
+            gap: 0.25rem;
+        }
+    </style>
+{% endif %}
+{% endblock %}

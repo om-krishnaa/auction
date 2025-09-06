@@ -1,0 +1,140 @@
+{% extends 'public_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% if setting %}Edit{% else %}Add New{% endif %} Site Setting</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.office_description.id_for_label }}" class="form-label">Office Description</label>
+                            {{ form.office_description }}
+                            {% if form.office_description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.office_description.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.office_phone.id_for_label }}" class="form-label">Office Phone</label>
+                            {{ form.office_phone }}
+                            {% if form.office_phone.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.office_phone.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.office_address.id_for_label }}" class="form-label">Office Address</label>
+                            {{ form.office_address }}
+                            {% if form.office_address.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.office_address.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.office_email.id_for_label }}" class="form-label">Office Email</label>
+                            {{ form.office_email }}
+                            {% if form.office_email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.office_email.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.facebook.id_for_label }}" class="form-label">Facebook URL</label>
+                            {{ form.facebook }}
+                            {% if form.facebook.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.facebook.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.x.id_for_label }}" class="form-label">X (Twitter) URL</label>
+                            {{ form.x }}
+                            {% if form.x.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.x.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.instagram.id_for_label }}" class="form-label">Instagram URL</label>
+                            {{ form.instagram }}
+                            {% if form.instagram.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.instagram.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.linkedin.id_for_label }}" class="form-label">LinkedIn URL</label>
+                            {{ form.linkedin }}
+                            {% if form.linkedin.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.linkedin.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.iframe.id_for_label }}" class="form-label">Map Iframe</label>
+                            {{ form.iframe }}
+                            {% if form.iframe.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.iframe.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <div class="form-text">Paste the Google Maps embed iframe code here</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'sitesetting_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+    }
+    textarea.form-control {
+        min-height: 100px;
+    }
+</style>
+{% endblock %} 

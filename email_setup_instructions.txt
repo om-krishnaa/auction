@@ -1,0 +1,35 @@
+Follow these steps to set up email:
+
+1. Create a file named '.env' in this directory (C:\Users\Mahesh dhakal\Downloads\summer project\summer project)
+
+2. Add these lines to the .env file (replace with your actual values):
+
+SECRET_KEY=django-insecure-your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+# Email settings
+EMAIL_HOST_USER=your_gmail@gmail.com
+EMAIL_HOST_PASSWORD=your_16_character_app_password
+
+3. To get your Gmail App Password:
+   a. Go to https://myaccount.google.com/security
+   b. Enable 2-Step Verification if not already enabled
+   c. Go to App Passwords (under 2-Step Verification)
+   d. Select 'Mail' and 'Other (Custom name)'
+   e. Name it 'Django eAuction'
+   f. Click Generate
+   g. Copy the 16-character password (remove any spaces)
+
+4. Replace in .env file:
+   - your_gmail@gmail.com with your actual Gmail address
+   - your_16_character_app_password with the App Password (no spaces)
+
+5. After creating the .env file, restart your Django server
+
+Example .env content:
+SECRET_KEY=django-insecure-your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+EMAIL_HOST_USER=john.doe@gmail.com
+EMAIL_HOST_PASSWORD=abcdefghijklmnop 

@@ -1,0 +1,141 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}User Risk Profiles{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <h4 class="page-title">User Risk Profiles</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="risk_level" class="form-label">Risk Level</label>
+                            <select name="risk_level" id="risk_level" class="form-select">
+                                <option value="">All Risk Levels</option>
+                                <option value="low" {% if request.GET.risk_level == 'low' %}selected{% endif %}>Low (0-30%)</option>
+                                <option value="medium" {% if request.GET.risk_level == 'medium' %}selected{% endif %}>Medium (30-60%)</option>
+                                <option value="high" {% if request.GET.risk_level == 'high' %}selected{% endif %}>High (60-80%)</option>
+                                <option value="critical" {% if request.GET.risk_level == 'critical' %}selected{% endif %}>Critical (80-100%)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="flagged" class="form-label">Flagged Status</label>
+                            <select name="flagged" id="flagged" class="form-select">
+                                <option value="">All Users</option>
+                                <option value="true" {% if request.GET.flagged == 'true' %}selected{% endif %}>Flagged Only</option>
+                                <option value="false" {% if request.GET.flagged == 'false' %}selected{% endif %}>Not Flagged</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                                <a href="{% url 'user_risk_profiles' %}" class="btn btn-secondary">Clear</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Profiles Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Risk Score</th>
+                                    <th>Total Bids</th>
+                                    <th>Success Rate</th>
+                                    <th>Avg Bid Amount</th>
+                                    <th>Account Age</th>
+                                    <th>Flagged</th>
+                                    <th>Last Bid</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in profiles %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ profile.user.username }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ profile.user.get_full_name|default:"No name" }}</small>
+                                    </td>
+                                    <td>{{ profile.user.email }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress me-2" style="width: 100px; height: 20px;">
+                                                <div class="progress-bar bg-{% if profile.risk_score >= 80 %}danger{% elif profile.risk_score >= 60 %}warning{% elif profile.risk_score >= 40 %}info{% else %}success{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ profile.risk_score }}%"
+                                                     aria-valuenow="{{ profile.risk_score }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <span class="fw-bold">{{ profile.risk_score|floatformat:1 }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ profile.total_bids }}</td>
+                                    <td>
+                                        {% if profile.total_bids > 0 %}
+                                            {{ profile.successful_bids|floatformat:0 }}/{{ profile.total_bids }}
+                                            ({{ profile.successful_bids|floatformat:0|div:profile.total_bids|mul:100|floatformat:1 }}%)
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>Rs. {{ profile.average_bid_amount|floatformat:0 }}</td>
+                                    <td>{{ profile.account_age_days }} days</td>
+                                    <td>
+                                        {% if profile.is_flagged %}
+                                            <span class="badge bg-danger">Flagged</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Clean</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if profile.last_bid_time %}
+                                            {{ profile.last_bid_time|timesince }} ago
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'flag_user' profile.user.id %}" class="btn btn-sm btn-outline-primary">
+                                            {% if profile.is_flagged %}Unflag{% else %}Flag{% endif %}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">No user profiles found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
