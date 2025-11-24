@@ -10,7 +10,7 @@ class AdminAccessMiddleware:
 
     def __call__(self, request):
         # Check if the path starts with /admin/
-        if request.path.startswith('/arjun/admin/'):
+        if request.path.startswith('/om/admin/'):
             # If the user is not authenticated or not staff
             if not (request.user.is_authenticated and request.user.user_type == "admin"):
                 return HttpResponseForbidden("You are not authorized to access the admin panel.")

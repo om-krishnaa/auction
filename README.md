@@ -42,7 +42,7 @@ A Django-based auction platform with admin and public panels.
 ## Access URLs
 
 - **Main Site**: http://127.0.0.1:8000/
-- **Admin Panel**: http://127.0.0.1:8000/arjun/
+- **Admin Panel**: http://127.0.0.1:8000/om/
 - **Django Admin**: http://127.0.0.1:8000/admin/
 
 ## Default Admin Credentials
