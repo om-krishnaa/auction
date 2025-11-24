@@ -17,6 +17,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import random
 import re
+from django.db.models import Q
+from .models import AuctionItem
 from django.core.cache import cache
 from django.conf import settings
 import logging
@@ -750,6 +752,19 @@ def user_dashboard(request):
     except Exception as e:
         messages.error(request, f"Error loading dashboard: {str(e)}")
         return render(request, 'public_panel/user_dashboard.html', {})
+    
+    #for search
+
+
+def search(request):
+    q = request.GET.get('q', '')
+
+    results = AuctionItem.objects.filter(
+        Q(title__icontains=q) | Q(description__icontains=q)
+    )
+
+    return render(request, 'public_panel/search.html', {'query': q, 'results': results})
+
 
 
 
@@ -941,8 +956,9 @@ def user_dashboard(request):
 #         return False
     
 
+# for search options
 
-    
+
 # OTP email function removed - no longer needed for simple registration
 
     

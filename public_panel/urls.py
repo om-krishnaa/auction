@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from public_panel.views import (
     home, register, forgetpassword,
     about_us, contact, bidnow, product_detail, login_view, showbid, logout_view, ProfileView, UserBiddingDetailsView,
@@ -30,4 +31,8 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='profile'),
     path('showbid', UserBiddingDetailsView.as_view(), name='showbid'),
     path('dashboard/', user_dashboard, name='user_dashboard'),
+
+    #for search functionality
+    path('search/', views.search, name='search'),
+
 ]

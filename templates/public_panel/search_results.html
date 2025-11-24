@@ -1,0 +1,23 @@
+<!-- <h2>Search Results for "{{ query }}"</h2>
+
+{% if results %}
+    <div class="row">
+        {% for item in results %}
+        <div class="col-md-4 mt-3">
+            <div class="card">
+                <img src="{{ item.image.url }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text">{{ item.description|truncatechars:70 }}</p>
+                    <a href="{% url 'auction_detail' item.id %}" class="btn btn-primary">
+                        View Item
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% else %}
+    <p>No matching items found.</p>
+{% endif %} -->
