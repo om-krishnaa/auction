@@ -22,91 +22,44 @@ User = get_user_model()
 
 @login_required(login_url='/login/')
 def index(request):
-    # Get current date and date ranges
+    # 1. Setup Dates
     today = timezone.now()
-    thirty_days_ago = today - timedelta(days=30)
     seven_days_ago = today - timedelta(days=7)
-    this_month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    thirty_days_ago = today - timedelta(days=30)
     
-    # Base queryset excluding admins and superusers
+    # 2. Base queryset (excludes admins so you only see customers)
     regular_users = User.objects.exclude(user_type='admin').exclude(is_superuser=True)
     
-    # User Statistics - Only regular users
+    # 3. Statistics for the Cards
     total_users = regular_users.count()
     new_users_this_week = regular_users.filter(date_joined__gte=seven_days_ago).count()
-    new_users_this_month = regular_users.filter(date_joined__gte=this_month_start).count()
+    new_users_this_month = regular_users.filter(date_joined__gte=thirty_days_ago).count()
     
-    # Product Statistics
-    total_products = Product.objects.count()
-    active_auctions = Product.objects.filter(Auction=True, event_ends__gt=today).count()
-    upcoming_auctions = Product.objects.filter(is_upcoming=True).count()
-    
-    # Bidding Statistics
-    total_bids = Bidnow.objects.count()
-    bids_this_week = Bidnow.objects.filter(created_at__gte=seven_days_ago).count()
-    total_bid_value = Bidnow.objects.aggregate(total=Sum('bid_amount'))['total'] or 0
-    
-    # Fraud Detection Statistics
-    total_fraud_alerts = FraudAlert.objects.count()
-    unresolved_alerts = FraudAlert.objects.filter(is_resolved=False).count()
-    high_risk_users = UserBehaviorProfile.objects.filter(risk_score__gte=70).count()
-    
-    # Get user types distribution - only for regular users
-    user_types = regular_users.values('user_type').annotate(count=Count('id'))
-    
-    # Get recent users - only regular users
+    # 4. RECENT USERS (This is what was missing for your table)
     recent_users = regular_users.order_by('-date_joined')[:5]
     
-    # Get recent bids
-    recent_bids = Bidnow.objects.select_related('user', 'product').order_by('-created_at')[:5]
+    # 5. Chart Data Logic
+    monthly_data = regular_users.annotate(month=TruncMonth('date_joined')).values('month').annotate(
+        total_users=Count('id'),
+        new_users=Count('id', filter=Q(date_joined__gte=thirty_days_ago))
+    ).order_by('-month')[:6]
     
-    # Get recent fraud alerts
-    recent_fraud_alerts = FraudAlert.objects.filter(is_resolved=False).order_by('-created_at')[:5]
-    
-    # Get monthly registration data for the charts
-    monthly_data = (
-        regular_users
-        .annotate(month=TruncMonth('date_joined'))
-        .values('month')
-        .annotate(
-            total_users=Count('id'),
-            new_users=Count('id', filter=Q(date_joined__gte=thirty_days_ago))
-        )
-        .order_by('-month')[:6]
-    )
-    
-    # Prepare data for the charts
-    chart_labels = [data['month'].strftime('%B %Y') for data in monthly_data]
-    total_users_data = [data['total_users'] for data in monthly_data]
-    new_users_data = [data['new_users'] for data in monthly_data]
-    
-    # Convert to JSON for template
     chart_json = {
-        'labels': json.dumps(chart_labels),
-        'total_users': json.dumps(total_users_data),
-        'new_users': json.dumps(new_users_data)
+        'labels': json.dumps([data['month'].strftime('%B %Y') for data in monthly_data]),
+        'total_users': json.dumps([data['total_users'] for data in monthly_data]),
+        'new_users': json.dumps([data['new_users'] for data in monthly_data])
     }
     
+    # 6. Final Context
     context = {
         'total_users': total_users,
         'new_users_this_week': new_users_this_week,
-        'new_users_this_month': new_users_this_month,
-        'total_products': total_products,
-        'active_auctions': active_auctions,
-        'upcoming_auctions': upcoming_auctions,
-        'total_bids': total_bids,
-        'bids_this_week': bids_this_week,
-        'total_bid_value': total_bid_value,
-        'total_fraud_alerts': total_fraud_alerts,
-        'unresolved_alerts': unresolved_alerts,
-        'high_risk_users': high_risk_users,
-        'user_types': user_types,
-        'recent_users': recent_users,
-        'recent_bids': recent_bids,
-        'recent_fraud_alerts': recent_fraud_alerts,
+        'new_users_this_month': new_users_this_month, # Added for your 3rd card
+        'recent_users': recent_users,               # Added for your table
+        'total_products': Product.objects.count(),
+        'active_auctions_count': Product.objects.filter(Auction=True, event_ends__gt=today).count(),
         'chart_json': chart_json,
     }
-    
     return render(request, 'admin_panel/index.html', context)
 
 def admin_login_view(request):
@@ -687,46 +640,58 @@ def fraud_dashboard(request):
 # Auction Management Views
 @login_required(login_url='/login/')
 def auction_management(request):
-    """Auction management dashboard"""
+    """Specific Auction Management Page with Tables"""
     try:
-        # Get auction statistics
-        stats = auction_manager.get_auction_statistics()
-        
-        # Get active auctions with time remaining
         now = timezone.now()
+        
+        # We must use these exact names because your HTML uses: 
+        # {% for auction in active_auctions %}
         active_auctions = Product.objects.filter(
-            Auction=True,
+            Auction=True, 
             event_ends__gt=now
         ).order_by('event_ends')
         
-        # Add time remaining to each auction
-        for auction in active_auctions:
-            auction.time_remaining = auction_manager.get_auction_time_remaining(auction)
-        
-        # Get upcoming auctions
+        # {% for auction in upcoming_auctions %}
         upcoming_auctions = Product.objects.filter(
-            is_upcoming=True,
-            Auction=False,
-            event_ends__gt=now
-        ).order_by('event_ends')
+            is_upcoming=True
+        ).order_by('event')
         
-        # Get recent winners
-        recent_winners = AuctionWinner.objects.select_related(
-            'product', 'winner'
-        ).order_by('-auction_ended_at')[:10]
+        # {% for auction in expired_auctions %}
+        expired_auctions = Product.objects.filter(
+            Auction=True, 
+            event_ends__lte=now
+        ).order_by('-event_ends')
         
+        # {% for winner in recent_winners %}
+        recent_winners = AuctionWinner.objects.select_related('product', 'winner').order_by('-won_at')[:10]
+
+        # Your HTML uses {{ stats.active_auctions }}
+        stats = {
+            'active_auctions': active_auctions.count(),
+            'upcoming_auctions': upcoming_auctions.count(),
+            'closed_auctions': expired_auctions.count(),
+            'total_winners': AuctionWinner.objects.count(),
+        }
+
         context = {
-            'stats': stats,
             'active_auctions': active_auctions,
             'upcoming_auctions': upcoming_auctions,
+            'expired_auctions': expired_auctions,
             'recent_winners': recent_winners,
+            'stats': stats,
         }
-        
         return render(request, 'admin_panel/auction_management.html', context)
         
     except Exception as e:
         messages.error(request, f"Error loading auction management: {str(e)}")
-        return render(request, 'admin_panel/auction_management.html', {})
+        # Return empty lists so the page doesn't crash
+        return render(request, 'admin_panel/auction_management.html', {
+            'active_auctions': [],
+            'upcoming_auctions': [],
+            'expired_auctions': [],
+            'recent_winners': [],
+            'stats': {'active_auctions': 0, 'upcoming_auctions': 0, 'closed_auctions': 0, 'total_winners': 0}
+        })
 
 @login_required(login_url='/login/')
 def close_auction_manual(request, product_id):

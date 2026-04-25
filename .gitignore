@@ -1,80 +1,42 @@
-# Byte-compiled / optimized / DLL files
+# --- Python & Cache (Trash) ---
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Virtual environment
-venv/
+.Python
 env/
+venv/
 ENV/
 .venv/
-.pip/
 
-# Django stuff:
+# --- Django Essentials ---
+# We REMOVED static/ and staticfiles/ from here so they ARE pushed to Git
+media/
 *.log
 *.pot
-*.pyc
 *.sqlite3
 db.sqlite3
-media/
-staticfiles/
-static/
 
-# Django migrations
+# --- Migrations ---
+# Keeping migrations is important for your team, but we ignore the cache
 */migrations/__pycache__/
-*/migrations/*.pyc
-*/migrations/*.pyo
-*/migrations/*.py~
 
-# Secret settings
+# --- Secret Files ---
+# NEVER push these (Security Risk)
 .env
-*.env
+local_settings.py
 
-# Pytest
-.cache/
-.pytest_cache/
+# --- Heavy Files (Git constraints) ---
+# Git does not support files >100MB easily.
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.tar.gz
 
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-
-# MyPy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre
-.pyre/
-
-# Pylint
-pylint-report.txt
-pylint-output.txt
-
-# Test results
-test-results/
-
-# VSCode
+# --- System & IDE ---
 .vscode/
-
-# PyCharm
 .idea/
-
-# macOS
 .DS_Store
-
-# Windows
 Thumbs.db
-ehthumbs.db
-
-# Backup files
-*.bak
-*.swp
-*~
-
-# Local PostgreSQL dump or backups
-*.dump
-*.sql

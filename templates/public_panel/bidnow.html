@@ -25,7 +25,7 @@
 
   .custom-alert-success {
     background-color: #4CAF50; /* Green */
-    color: rgb(223, 20, 20);
+    color: white; /* Fixed from red for better readability */
   }
 
   .custom-alert-error {
@@ -54,7 +54,7 @@
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: #b61d1d;
+    background-color: #ffffff; /* Changed from red to white for better content visibility */
   }
 
   .custom-card:hover {
@@ -85,18 +85,18 @@
 
   /* Bid Button Styling */
   .btn-bid {
-    background-color: #b6f00a; /* Coral Red */
+    background-color: #b6f00a; 
     border: none;
     padding: 14px;
     font-weight: bold;
     border-radius: 8px;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    color: rgb(129, 184, 19);
+    color: #333;
     width: 100%;
   }
 
   .btn-bid:hover {
-    background-color: #e05e52; /* Darker Coral */
+    background-color: #a2d609; 
     transform: translateY(-2px);
   }
 
@@ -111,23 +111,8 @@
     color: #6c757d;
   }
 
-  /* Container Styles */
-  .container {
-    max-width: 1200px;
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-
   .card-body {
     padding: 30px;
-  }
-
-  .mb-4 {
-    margin-bottom: 1.5rem;
-  }
-
-  .mb-3 {
-    margin-bottom: 1.25rem;
   }
 
   /* Form Styling */
@@ -140,25 +125,12 @@
   }
 
   .form-control:focus {
-    border-color: #FF6F61; /* Coral Red */
+    border-color: #FF6F61; 
     box-shadow: 0 0 8px rgba(255, 111, 97, 0.2);
-  }
-
-  /* Media Queries for Responsive Design */
-  @media (max-width: 768px) {
-    .product-img {
-      max-height: 200px;
-    }
-
-    .container {
-      padding-left: 15px;
-      padding-right: 15px;
-    }
   }
 </style>
 
 <div class="container my-5">
-    <!-- Alert Messages -->
     {% if messages %}
     <div class="row justify-content-center">
       <div class="col-md-8">
@@ -187,7 +159,6 @@
             <div class="card custom-card">
                 <div class="card-body">
 
-                    <!-- Product Overview -->
                     <div class="text-center mb-4">
                         {% if product.product_image %}
                             <img src="{{ product.product_image.url }}" alt="{{ product.title }}" class="img-fluid product-img">
@@ -200,7 +171,6 @@
 
                     <hr>
 
-                    <!-- Product Description as Bullet Points -->
                     <div class="mb-3">
                         <p><strong>Product Features:</strong></p>
                         <ul class="product-description">
@@ -208,34 +178,31 @@
                         </ul>
                     </div>
 
-                    <!-- Current Price -->
                     <div class="mb-3">
                         <p><strong>Starting Price:</strong> Rs. {{ product.discounted_price }}</p>
+                        {% if bid_info %}
+                            <p><strong>Current Highest:</strong> Rs. {{ bid_info.current_highest }}</p>
+                        {% endif %}
                     </div>
 
-                    <!-- Bidding Form -->
-                    {% if already_bid %}
-                        <!-- If the user has already placed a bid, hide the bid input field -->
-                        <div class="alert alert-warning">
-                            You have already placed a bid for this product.
-                        </div>
-                    {% else %}
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="prod_id" value="{{ product.id }}">
+                    <hr>
 
-                            {% for field in fm %}
-                                <div class="mb-3">
-                                    {{ field.label_tag }} {{ field }}
-                                    {% if field.errors %}
-                                        <div class="text-danger small">{{ field.errors|striptags }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="prod_id" value="{{ product.id }}">
 
-                            <button type="submit" class="btn btn-bid w-100 shadow">Place Your Bid</bg></button>
-                        </form>
-                    {% endif %}
+                        {% for field in fm %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">{{ field.errors|striptags }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-bid w-100 shadow">Place Your Bid</button>
+                    </form>
 
                 </div>
             </div>

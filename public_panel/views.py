@@ -18,6 +18,8 @@ from django.core.exceptions import ValidationError
 import random
 import re
 from django.db.models import Q
+from public_panel.models import Auction
+from .models import Auction
 from .models import AuctionItem
 from django.core.cache import cache
 from django.conf import settings
@@ -28,6 +30,8 @@ from django.utils.html import strip_tags
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -55,28 +59,29 @@ def showbid(request):
     return render(request, 'public_panel/showbid.html', {'bids': bids})
 
 def bidnow(request):
-    # Get the product id from the POST data
-    prod_id = request.POST.get('prod_id')
+    # LOOK HERE: We check BOTH POST and GET for the product ID
+    prod_id = request.POST.get('prod_id') or request.GET.get('prod_id')
+    
+    # If no ID is found at all, redirect home instead of crashing with 404
+    if not prod_id:
+        return redirect('home')
+
     product = get_object_or_404(Product, id=prod_id)
 
-    # Check if the user has already placed a bid for this product
+    # Check if user has already bid (for UI info only)
     already_bid = Bidnow.objects.filter(user=request.user, product=product).exists()
 
     if request.method == 'POST':
         form = BidForm(request.POST)
 
-        # If the form is valid and the user hasn't placed a bid
-        if form.is_valid() and not already_bid:
+        if form.is_valid(): 
             bid_amount = form.cleaned_data['bid_amount']
-
-            # Use advanced bidding service with fraud detection
+            
             from App.bidding_service import bidding_service
             
-            # Get client IP and user agent for fraud detection
             ip_address = request.META.get('REMOTE_ADDR', '')
             user_agent = request.META.get('HTTP_USER_AGENT', '')
             
-            # Place bid with fraud detection
             result = bidding_service.place_bid(
                 user=request.user,
                 product=product,
@@ -87,35 +92,17 @@ def bidnow(request):
             
             if result['success']:
                 messages.success(request, f"Your bid of Rs. {bid_amount} has been placed successfully!")
-                
-                # Show warnings if any
-                if result.get('warnings'):
-                    for warning in result['warnings']:
-                        messages.warning(request, warning)
-                
-                # Show risk score if high
-                if result.get('risk_score', 0) > 60:
-                    messages.info(request, f"Note: Your bid has a risk score of {result['risk_score']:.1f}%")
+                # Redirect back to the same page with the product ID in the URL
+                return redirect(f'/bidnow/?prod_id={product.id}')
             else:
                 messages.error(request, result.get('message', 'Failed to place bid'))
-                if result.get('details'):
-                    for detail in result['details']:
-                        messages.error(request, detail)
-            
-            return render(request, 'public_panel/bidnow.html', {'fm': form, 'product': product, 'already_bid': already_bid})
+    else:
+        form = BidForm()
 
-        # If the user has already placed a bid
-        elif already_bid:
-            messages.error(request, "You have already placed a bid for this product.")
-            return render(request, 'public_panel/bidnow.html', {'fm': form, 'product': product, 'already_bid': already_bid})
-        else:
-            form = BidForm()  # Initialize empty form
-
-    # Get current bid information
+    # Get current bid information for the UI
     from App.bidding_service import bidding_service
     bid_info = bidding_service.get_current_bid_info(product)
     
-    # Context for rendering
     return render(request, 'public_panel/bidnow.html', {
         'fm': form,
         'product': product,
@@ -757,13 +744,17 @@ def user_dashboard(request):
 
 
 def search(request):
-    q = request.GET.get('q', '')
+    query = request.GET.get('q', '')  # get the search query
+    if query:
+        results = Auction.objects.filter(title__icontains=query)
+    else:
+        results = Auction.objects.none()  # empty queryset
 
-    results = AuctionItem.objects.filter(
-        Q(title__icontains=q) | Q(description__icontains=q)
-    )
-
-    return render(request, 'public_panel/search.html', {'query': q, 'results': results})
+    context = {
+        'query': query,
+        'results': results,
+    }
+    return render(request, 'search.html', context)
 
 
 

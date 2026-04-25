@@ -177,7 +177,7 @@ class FraudDetectionEngine:
                 ).count()
                 
                 # Define thresholds for each time window
-                thresholds = {1: 3, 5: 8, 15: 15, 60: 25}
+                thresholds = {1: 10, 5: 20, 15: 40, 60: 100}
                 threshold = thresholds.get(window_name, 10)
                 
                 if recent_bids > threshold:
@@ -271,7 +271,7 @@ class FraudDetectionEngine:
             if len(user_bids) >= 3:
                 amounts = [float(bid.bid_amount) for bid in user_bids]
                 if self._is_sequential_pattern(amounts):
-                    risk_score += 20
+                    risk_score += 5
                     patterns.append("Sequential bidding pattern")
             
             # Check for bid timing patterns (last minute bidding)
